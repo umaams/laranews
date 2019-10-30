@@ -37,18 +37,18 @@
                 <div class="collapse navbar-collapse" id="app-navbar-collapse">
                     <!-- Left Side Of Navbar -->
                     <ul class="nav navbar-nav">
+                        @if(Auth::check())
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" v-pre>
                                 Admin <span class="caret"></span>
                             </a>
-                            @if(Auth::check())
                             <ul class="dropdown-menu">
                                 <li>
                                     <a href="{{ route('news.index') }}">Berita</a>
                                 </li>
                             </ul>
-                            @endif
                         </li>
+                        @endif
                     </ul>
 
                     <!-- Right Side Of Navbar -->

@@ -19,7 +19,7 @@ class NewsController extends Controller
     {
         $news_categories = NewsCategory::withCount(['news'])->orderBy('name')->get();
         $users = User::withCount(['news'])->orderBy('name')->get();
-        $news = News::orderBy('post_date', 'desc')->paginate();
+        $news = News::with(['news_category', 'created_user'])->orderBy('post_date', 'desc')->paginate();
         return view('home', compact('news', 'news_categories', 'users'));
     }
 
@@ -50,9 +50,13 @@ class NewsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($slug)
     {
-        //
+        $news = News::with(['news_category', 'created_user'])->where('slug', $slug)->first();
+        News::findOrFail($news->id)->update([
+            'viewer_count' => intval($news->viewer_count) + 1
+        ]);
+        return view('detail', compact('news'));
     }
 
     /**

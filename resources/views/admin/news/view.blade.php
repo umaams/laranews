@@ -18,6 +18,12 @@
                             </select>
                         </div>
                         <div class="col-md-2">
+                            <select class="form-control" id="deleted">
+                                <option value="false">Semua Berita</option>
+                                <option value="true" @if ($deleted == true) selected @endif>Berita Terhapus</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
                             <a href="{{ route('news.create') }}" class="btn btn-primary">Buat Berita</a>
                         </div>
                     </div>
@@ -31,13 +37,14 @@
                                             <th class="text-center">Judul</th>
                                             <th class="text-center">Tanggal Post</th>
                                             <th class="text-center">Kategori Berita</th>
+                                            <th class="text-center">Pengirim</th>
                                             <th class="text-center">Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
                                         @if ($news->count() == 0)
                                         <tr>
-                                            <td class="text-center" colspan="4">Tidak ada data</td>
+                                            <td class="text-center" colspan="5">Tidak ada data</td>
                                         </tr>
                                         @endif
                                         @foreach($news as $item)
@@ -45,13 +52,27 @@
                                             <td>{{ $item->title }}</td>
                                             <td class="text-center">{{ $item->post_date->format('d F Y') }}</td>
                                             <td class="text-center">{{ $item->news_category->name }}</td>
+                                            <td class="text-center">{{ $item->created_user->name }}</td>
                                             <td class="text-center">
+                                                @if ($item->trashed())
+                                                <form class="form-horizontal" style="display: inline;" method="post" action="{{ route('news.restore', ['id' => $item->id]) }}">
+                                                    <input type="hidden" name="_method" value="PUT">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="btn btn-xs btn-success">Restore</button>
+                                                </form>
+                                                <form class="form-horizontal" style="display: inline;" method="post" action="{{ route('news.destroy.force', ['id' => $item->id]) }}">
+                                                    <input type="hidden" name="_method" value="DELETE">
+                                                    <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                                                    <button type="submit" class="btn btn-xs btn-danger">Hapus Permanen</button>
+                                                </form>
+                                                @else
                                                 <a href="{{ route('news.edit', ['id' => $item->id]) }}" class="btn btn-xs btn-success">Edit</a> 
                                                 <form class="form-horizontal" style="display: inline;" method="post" action="{{ route('news.destroy', ['id' => $item->id]) }}">
                                                     <input type="hidden" name="_method" value="DELETE">
                                                     <input type="hidden" name="_token" value="{{ csrf_token() }}">
                                                     <button type="submit" class="btn btn-xs btn-danger">Hapus</button>
                                                 </form>
+                                                @endif
                                             </td>
                                         </tr>
                                         @endforeach
@@ -76,6 +97,9 @@
 <script>
     document.getElementById('news_category_id').onchange = function() {
         window.location = "{{ route('news.index') }}" + (this.value != '' ? '?news_category_id=' + this.value : '');
+    };
+    document.getElementById('deleted').onchange = function() {
+        window.location = "{{ route('news.index') }}" + (this.value == 'true' ? '?deleted=' + this.value : '');
     };
 </script>
 @endsection

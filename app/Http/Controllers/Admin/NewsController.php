@@ -30,11 +30,13 @@ class NewsController extends Controller
     public function index(Request $request)
     {
         $news_categories = NewsCategory::orderBy('name')->get();
-        $query = News::with(['news_category'])->orderBy('created_at', 'desc');
+        $query = News::with(['news_category', 'created_user'])->orderBy('created_at', 'desc');
         if ($request->has('news_category_id')) $query->where('news_category_id', $request->get('news_category_id'));
+        if ($request->has('deleted') && $request->get('deleted') == true) $query->onlyTrashed();
         $news = $query->paginate();
         $news_category_id = $request->get('news_category_id');
-        return view('admin.news.view', compact('news', 'news_categories', 'news_category_id'));
+        $deleted = $request->get('deleted');
+        return view('admin.news.view', compact('news', 'news_categories', 'news_category_id', 'deleted'));
     }
 
     /**
@@ -57,15 +59,15 @@ class NewsController extends Controller
      */
     public function store(NewsStore $request)
     {
-        $request->slug = str_slug($request->slug, '-');
+        $request->merge(['slug' => str_slug($request->slug, '-')]);
         $news = News::create($request->all());
         if ($request->hasFile('image_file')) {
             $file = $request->file('image_file');
             $imageName = 'images_news_'.$news->id.'_'.$request->image_file->getClientOriginalName();
             $request->image_file->move(public_path('image_uploads'), $imageName);
-            if ($news->image_path != null) unlink($news->image_path);
+            if ($news->image_path != null) unlink(public_path('image_uploads')."/".$news->image_path);
             $news->update([
-                'image_path' => public_path('image_uploads/').$imageName
+                'image_path' => $imageName
             ]);
         }
         return redirect()->route('news.index');
@@ -105,16 +107,16 @@ class NewsController extends Controller
      */
     public function update(NewsUpdate $request, $id)
     {
-        $request->slug = str_slug($request->slug, '-');
+        $request->merge(['slug' => str_slug($request->slug, '-')]);
         $news = News::findOrFail($id);
         $news->update($request->all());
         if ($request->hasFile('image_file')) {
             $file = $request->file('image_file');
             $imageName = 'images_news_'.$news->id.'_'.$request->image_file->getClientOriginalName();
             $request->image_file->move(public_path('image_uploads'), $imageName);
-            if ($news->image_path != null) unlink($news->image_path);
+            if ($news->image_path != null) unlink(public_path('image_uploads')."/".$news->image_path);
             $news->update([
-                'image_path' => public_path('image_uploads/').$imageName
+                'image_path' => $imageName
             ]);
         }
         return redirect()->route('news.index');
@@ -129,8 +131,22 @@ class NewsController extends Controller
     public function destroy($id)
     {
         $news = News::findOrFail($id);
-        if ($news->image_path != null) unlink($news->image_path);
         $news->delete();
+        return redirect()->route('news.index');
+    }
+
+    public function restore($id)
+    {
+        $news = News::onlyTrashed()->findOrFail($id);
+        $news->restore();
+        return redirect()->route('news.index');
+    }
+
+    public function forceDestroy($id)
+    {
+        $news = News::onlyTrashed()->findOrFail($id);
+        if ($news->image_path != null) unlink(public_path('image_uploads')."/".$news->image_path);
+        $news->forceDelete();
         return redirect()->route('news.index');
     }
 }
