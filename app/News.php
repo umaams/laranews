@@ -18,5 +18,10 @@ class News extends Model
         'title', 'slug', 'post_date', 'news_category_id', 'content', 'viewer_count', 'image_path', 'created_user_id'
     ];
 
-    protected $dates = ['deleted_at'];
+    protected $dates = ['post_date', 'deleted_at'];
+
+    public function news_category()
+    {
+        return $this->belongsTo('App\NewsCategory', 'news_category_id');
+    }
 }

@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\NewsStore;
+use App\Http\Requests\NewsUpdate;
 use App\NewsCategory;
 use App\News;
 use App\User;
@@ -11,14 +13,28 @@ use App\User;
 class NewsController extends Controller
 {
     /**
+     * Create a new controller instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $news = News::orderBy('created_at', 'desc')->paginate();
-        return view('admin.news.view', compact('news'));
+        $news_categories = NewsCategory::orderBy('name')->get();
+        $query = News::with(['news_category'])->orderBy('created_at', 'desc');
+        if ($request->has('news_category_id')) $query->where('news_category_id', $request->get('news_category_id'));
+        $news = $query->paginate();
+        $news_category_id = $request->get('news_category_id');
+        return view('admin.news.view', compact('news', 'news_categories', 'news_category_id'));
     }
 
     /**
@@ -39,7 +55,7 @@ class NewsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(NewsStore $request)
     {
         $request->slug = str_slug($request->slug, '-');
         News::create($request->all());
@@ -65,7 +81,10 @@ class NewsController extends Controller
      */
     public function edit($id)
     {
-        //
+        $news = News::findOrFail($id);
+        $news_categories = NewsCategory::orderBy('name')->get();
+        $users = User::orderBy('name')->get();
+        return view('admin.news.edit', compact('news', 'news_categories', 'users'));
     }
 
     /**
@@ -75,7 +94,7 @@ class NewsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(NewsUpdate $request, $id)
     {
         $request->slug = str_slug($request->slug, '-');
         News::findOrFail($id)->update($request->all());

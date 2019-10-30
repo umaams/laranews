@@ -12,6 +12,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    @yield('style')
 </head>
 <body>
     <div id="app">
@@ -40,13 +41,13 @@
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" v-pre>
                                 Admin <span class="caret"></span>
                             </a>
-
+                            @if(Auth::check())
                             <ul class="dropdown-menu">
                                 <li>
-                                    <a href="{{ route('news_categories.index') }}">Kategori Berita</a>
                                     <a href="{{ route('news.index') }}">Berita</a>
                                 </li>
                             </ul>
+                            @endif
                         </li>
                     </ul>
 
@@ -87,5 +88,6 @@
 
     <!-- Scripts -->
     <script src="{{ asset('js/app.js') }}"></script>
+    @yield('script')
 </body>
 </html>
