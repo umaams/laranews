@@ -19,4 +19,9 @@ class NewsCategory extends Model
     ];
 
     protected $dates = ['deleted_at'];
+
+    public function news()
+    {
+        return $this->hasMany('App\News', 'news_category_id');
+    }
 }

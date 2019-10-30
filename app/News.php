@@ -24,4 +24,9 @@ class News extends Model
     {
         return $this->belongsTo('App\NewsCategory', 'news_category_id');
     }
+
+    public function created_user()
+    {
+        return $this->belongsTo('App\User', 'created_user_id');
+    }
 }

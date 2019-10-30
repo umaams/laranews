@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Front;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\News;
+use App\NewsCategory;
+use App\User;
 
 class NewsController extends Controller
 {
@@ -15,8 +17,10 @@ class NewsController extends Controller
      */
     public function index()
     {
+        $news_categories = NewsCategory::withCount(['news'])->orderBy('name')->get();
+        $users = User::withCount(['news'])->orderBy('name')->get();
         $news = News::orderBy('post_date', 'desc')->paginate();
-        return view('home', compact('news'));
+        return view('home', compact('news', 'news_categories', 'users'));
     }
 
     /**

@@ -15,6 +15,6 @@ Route::get('/', 'Front\NewsController@index');
 
 Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+Route::get('/home', 'Front\NewsController@index')->name('home');
 Route::resource('news', 'Admin\NewsController');
 Route::resource('news_categories', 'Admin\NewsController');
