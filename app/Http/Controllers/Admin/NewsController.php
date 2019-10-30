@@ -58,7 +58,16 @@ class NewsController extends Controller
     public function store(NewsStore $request)
     {
         $request->slug = str_slug($request->slug, '-');
-        News::create($request->all());
+        $news = News::create($request->all());
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $imageName = 'images_news_'.$news->id.'_'.$request->image_file->getClientOriginalName();
+            $request->image_file->move(public_path('image_uploads'), $imageName);
+            if ($news->image_path != null) unlink($news->image_path);
+            $news->update([
+                'image_path' => public_path('image_uploads/').$imageName
+            ]);
+        }
         return redirect()->route('news.index');
     }
 
@@ -97,7 +106,17 @@ class NewsController extends Controller
     public function update(NewsUpdate $request, $id)
     {
         $request->slug = str_slug($request->slug, '-');
-        News::findOrFail($id)->update($request->all());
+        $news = News::findOrFail($id);
+        $news->update($request->all());
+        if ($request->hasFile('image_file')) {
+            $file = $request->file('image_file');
+            $imageName = 'images_news_'.$news->id.'_'.$request->image_file->getClientOriginalName();
+            $request->image_file->move(public_path('image_uploads'), $imageName);
+            if ($news->image_path != null) unlink($news->image_path);
+            $news->update([
+                'image_path' => public_path('image_uploads/').$imageName
+            ]);
+        }
         return redirect()->route('news.index');
     }
 
@@ -109,7 +128,9 @@ class NewsController extends Controller
      */
     public function destroy($id)
     {
-        News::findOrFail($id)->delete();
+        $news = News::findOrFail($id);
+        if ($news->image_path != null) unlink($news->image_path);
+        $news->delete();
         return redirect()->route('news.index');
     }
 }

@@ -29,6 +29,7 @@ class NewsStore extends FormRequest
             'news_category_id' => 'required|exists:news_categories,id',
             'post_date' => 'required|date',
             'content' => 'required',
+            'image_file' => 'mimes:jpeg,jpg,png,gif|max:2000',
             'created_user_id' => 'required|exists:users,id'
         ];
     }

@@ -15,25 +15,40 @@
                         <div class="col-md-12">
                             <form class="form form-horizontal" method="post" action="{{ route('news.store') }}"  role="form" enctype="multipart/form-data">
                                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
-                                <div class="form-group">
+                                <div class="form-group{{ $errors->has('title') ? ' has-error' : '' }}">
                                     <label class="control-label col-md-3">Judul Berita</label>
                                     <div class="col-md-9">
                                         <input type="text" name="title" class="form-control" placeholder="Judul Berita" value="{{ old('title') }}"/>
+                                        @if ($errors->has('title'))
+                                            <span class="help-block">
+                                                <strong>{{ $errors->first('title') }}</strong>
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group{{ $errors->has('slug') ? ' has-error' : '' }}">
                                     <label class="control-label col-md-3">Slug</label>
                                     <div class="col-md-9">
                                         <input type="text" name="slug" class="form-control" placeholder="Slug Berita" value="{{ old('slug') }}"/>
+                                        @if ($errors->has('slug'))
+                                            <span class="help-block">
+                                                <strong>{{ $errors->first('slug') }}</strong>
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group{{ $errors->has('post_date') ? ' has-error' : '' }}">
                                     <label class="control-label col-md-3">Tanggal Post</label>
                                     <div class="col-md-3">
                                         <input type="date" name="post_date" class="form-control" placeholder="Tanggal" value="{{ old('post_date') }}"/>
+                                        @if ($errors->has('post_date'))
+                                            <span class="help-block">
+                                                <strong>{{ $errors->first('post_date') }}</strong>
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group{{ $errors->has('news_category_id') ? ' has-error' : '' }}">
                                     <label class="control-label col-md-3">Kategori Berita</label>
                                     <div class="col-md-4">
                                         <select class="form-control" name="news_category_id">
@@ -42,21 +57,36 @@
                                             <option value="{{ $news_category->id }}" @if($news_category->id == old('news_category_id')) selected @endif>{{ $news_category->name }}</option>
                                             @endforeach
                                         </select>
+                                        @if ($errors->has('news_category_id'))
+                                            <span class="help-block">
+                                                <strong>{{ $errors->first('news_category_id') }}</strong>
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group{{ $errors->has('content') ? ' has-error' : '' }}">
                                     <label class="control-label col-md-3">Isi Berita</label>
                                     <div class="col-md-9">
                                         <textarea id="content" name="content" class="form-control" placeholder="Isi Berita">{{ old('content') }}</textarea>
+                                        @if ($errors->has('content'))
+                                            <span class="help-block">
+                                                <strong>{{ $errors->first('content') }}</strong>
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group{{ $errors->has('image_file') ? ' has-error' : '' }}">
                                     <label class="control-label col-md-3">Gambar Berita</label>
                                     <div class="col-md-9">
                                         <input type="file" name="image_file" class="form-control"/>
+                                        @if ($errors->has('image_file'))
+                                            <span class="help-block">
+                                                <strong>{{ $errors->first('image_file') }}</strong>
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
-                                <div class="form-group">
+                                <div class="form-group{{ $errors->has('created_user_id') ? ' has-error' : '' }}">
                                     <label class="control-label col-md-3">Pengirim</label>
                                     <div class="col-md-3">
                                         <select class="form-control" name="created_user_id">
@@ -65,6 +95,11 @@
                                             <option value="{{ $user->id }}" @if($user->id == old('created_user_id')) selected @endif>{{ $user->name }}</option>
                                             @endforeach
                                         </select>
+                                        @if ($errors->has('created_user_id'))
+                                            <span class="help-block">
+                                                <strong>{{ $errors->first('created_user_id') }}</strong>
+                                            </span>
+                                        @endif
                                     </div>
                                 </div>
                                 <hr>
